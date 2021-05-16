@@ -26,30 +26,33 @@ from transportation.views import Signup
 
 
 class SchemaGenerator(OpenAPISchemaGenerator):
-
     def get_schema(self, request=None, public=False):
         schema = super(SchemaGenerator, self).get_schema(request, public)
-        schema.basePath = os.path.join(schema.basePath, 'api/')
+        schema.basePath = os.path.join(schema.basePath, "api/")
         return schema
 
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="Snippets API",
-      default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny, ),
+    openapi.Info(
+        title="Snippets API",
+        default_version="v1",
+        description="Test description",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/', include('transportation.urls')),
-    path('signup/', Signup.as_view(), name='sign_up'),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path("admin/", admin.site.urls),
+    path(
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path("api/", include("transportation.urls")),
+    path("signup/", Signup.as_view(), name="sign_up"),
+    path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
 ]

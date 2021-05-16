@@ -27,7 +27,7 @@ class PassengerView(viewsets.ModelViewSet):
     queryset = Passenger.objects.all()
     serializer_class = PassengerSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filterset_fields = ('user__email', )
+    filterset_fields = ("user__email",)
 
 
 class ModelView(viewsets.ModelViewSet):
@@ -52,6 +52,11 @@ class FlightView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = (
+        "departure_airport__address__city",
+        "arrival_airport__address__city",
+    )
 
 
 class SeatView(viewsets.ModelViewSet):
@@ -73,18 +78,22 @@ class Signup(generics.CreateAPIView):
     """
     Register User
     """
+
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
 
     def post(self, request, *args, **kwargs):
 
         raw_user = request.data.pop("user")
-        if User.objects.filter(models.Q(email=raw_user.get('email')) | models.Q(username=raw_user.get('username'))).exists():
+        if User.objects.filter(
+            models.Q(email=raw_user.get("email"))
+            | models.Q(username=raw_user.get("username"))
+        ).exists():
             return Response(
                 data={
                     "message": f"User with email {raw_user.get('email')} already exist"
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         user = User.objects.create_user(is_active=False, **raw_user)
@@ -106,4 +115,3 @@ class Signup(generics.CreateAPIView):
         # user.email_user(subject, message)
         #
         # return Response(data={"message": f"Email confirmation sent to {user.email}"}, status=status.HTTP_201_CREATED)
-

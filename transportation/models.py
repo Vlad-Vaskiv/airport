@@ -5,7 +5,7 @@ from base.models import BaseModel
 
 
 class FareConditions(models.TextChoices):
-    economy = 'economy', "Economy"
+    economy = "economy", "Economy"
     comfort = "comfort", "Comfort"
     business = "business", "Business"
 
@@ -24,7 +24,7 @@ class Model(BaseModel):
     """Class describing Aircraft model"""
 
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='models', null=True, blank=True)
+    image = models.ImageField(upload_to="models", null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -35,10 +35,10 @@ class Aircraft(BaseModel):
 
     code = models.CharField(max_length=3, unique=True)
     model = models.ForeignKey(Model, on_delete=models.CASCADE)
-    range = models.PositiveIntegerField(help_text='Maximum flight range, km')
+    range = models.PositiveIntegerField(help_text="Maximum flight range, km")
 
     def __str__(self):
-        return f'{self.code} - {self.model}'
+        return f"{self.code} - {self.model}"
 
 
 class Address(BaseModel):
@@ -52,7 +52,7 @@ class Address(BaseModel):
     timezone = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.country} - {self.city}\n{self.line}'
+        return f"{self.country} - {self.city}\n{self.line}"
 
 
 class Airport(BaseModel):
@@ -64,60 +64,75 @@ class Airport(BaseModel):
 
 class Flight(BaseModel):
     """Flight representation"""
+
     class Status(models.TextChoices):
         """Status enum"""
-        scheduled = 'scheduled', 'Scheduled'
-        on_time = 'on_time', 'On Time'
-        delayed = 'delayed', 'Delayed'
-        departed = 'departed', 'Departed'
-        arrived = 'arrived', 'Arrived'
-        cancelled = 'cancelled', 'Cancelled'
+
+        scheduled = "scheduled", "Scheduled"
+        on_time = "on_time", "On Time"
+        delayed = "delayed", "Delayed"
+        departed = "departed", "Departed"
+        arrived = "arrived", "Arrived"
+        cancelled = "cancelled", "Cancelled"
 
     flight_no = models.CharField(max_length=6)
     scheduled_departure = models.DateTimeField()
     scheduled_arrival = models.DateTimeField()
-    departure_airport = models.ForeignKey(Airport, on_delete=models.PROTECT, related_name='dep_flights')
-    arrival_airport = models.ForeignKey(Airport, on_delete=models.PROTECT, related_name='arr_flights')
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.scheduled)
+    departure_airport = models.ForeignKey(
+        Airport, on_delete=models.PROTECT, related_name="dep_flights"
+    )
+    arrival_airport = models.ForeignKey(
+        Airport, on_delete=models.PROTECT, related_name="arr_flights"
+    )
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.scheduled
+    )
     aircraft = models.ForeignKey(Aircraft, on_delete=models.PROTECT)
     actual_departure = models.DateTimeField(null=True, blank=True)
     actual_arrival = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        unique_together = (('flight_no', 'scheduled_departure'), )
+        unique_together = (("flight_no", "scheduled_departure"),)
         constraints = [
-            models.CheckConstraint(check=models.Q(scheduled_arrival__gte=models.F('scheduled_departure')), name='greater_check'),
+            models.CheckConstraint(
+                check=models.Q(scheduled_arrival__gte=models.F("scheduled_departure")),
+                name="greater_check",
+            ),
         ]
 
 
 class Seat(BaseModel):
     """Seat representation"""
 
-    aircraft = models.ForeignKey(Aircraft, on_delete=models.PROTECT, related_name='seats')
+    aircraft = models.ForeignKey(
+        Aircraft, on_delete=models.PROTECT, related_name="seats"
+    )
     seat_no = models.IntegerField()
     fare_condition = models.CharField(max_length=10, choices=FareConditions.choices)
 
     class Meta:
-        unique_together = (('aircraft_id', 'seat_no'), )
+        unique_together = (("aircraft_id", "seat_no"),)
 
     def __str__(self):
-        return f'{self.aircraft_id} - {self.seat_no}'
+        return f"{self.aircraft_id} - {self.seat_no}"
 
 
 class Ticket(BaseModel):
     """Ticket Booking representation"""
 
-    passenger = models.ForeignKey(Passenger, on_delete=models.CASCADE, related_name='tickets')
-    flight = models.ForeignKey(Flight, on_delete=models.PROTECT, related_name='tickets')
+    passenger = models.ForeignKey(
+        Passenger, on_delete=models.CASCADE, related_name="tickets"
+    )
+    flight = models.ForeignKey(Flight, on_delete=models.PROTECT, related_name="tickets")
     seat = models.ForeignKey(Seat, on_delete=models.PROTECT)
     total_amount = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
-        return f'{self.passenger} - {self.flight} - {self.seat} - {self.total_amount}'
+        return f"{self.passenger} - {self.flight} - {self.seat} - {self.total_amount}"
 
 
 class FareConditionPrice(BaseModel):
     fare_condition = models.CharField(max_length=10, choices=FareConditions.choices)
-    coef = models.DecimalField(max_digits=2, decimal_places=2, validators=[MinValueValidator(0.0)])
-
-
+    coef = models.DecimalField(
+        max_digits=2, decimal_places=2, validators=[MinValueValidator(0.0)]
+    )

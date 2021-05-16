@@ -35,4 +35,3 @@ class SeatAdmin(admin.ModelAdmin):
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
     pass
-
