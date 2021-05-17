@@ -46,7 +46,7 @@ class Address(BaseModel):
 
     country = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
-    line = models.CharField(max_length=255)
+    line = models.CharField(max_length=255, null=True, blank=True)
     lat = models.FloatField()
     lon = models.FloatField()
     timezone = models.CharField(max_length=10, null=True, blank=True)
