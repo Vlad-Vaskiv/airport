@@ -13,7 +13,6 @@ router.register("address", views.AddressView)
 router.register("flight", views.FlightView)
 router.register("seat", views.SeatView)
 router.register("ticket", views.TicketView)
+# router.register('price', views.PriceView, basename='get_price')
 
-urlpatterns = [
-    path("", include(router.urls)),
-]
+urlpatterns = [path("", include(router.urls)), path("price", views.PriceView.as_view())]

@@ -1,4 +1,3 @@
-
 from collections import namedtuple
 from string import ascii_uppercase
 import json
@@ -6,8 +5,23 @@ from transportation.models import Airport as AirportModel
 from transportation.models import Address
 
 ASCII_UPPERCASE = set(ascii_uppercase)
-Airport = namedtuple('Airport', ['name', 'city', 'country', 'iata', 'icao', 'lat', 'lon', 'alt', 'tz', 'dst', 'tzdb'])
-Other = namedtuple('Other', ['iata', 'name', 'country', 'subdiv', 'type', 'lat', 'lon'])
+Airport = namedtuple(
+    "Airport",
+    [
+        "name",
+        "city",
+        "country",
+        "iata",
+        "icao",
+        "lat",
+        "lon",
+        "alt",
+        "tz",
+        "dst",
+        "tzdb",
+    ],
+)
+Other = namedtuple("Other", ["iata", "name", "country", "subdiv", "type", "lat", "lon"])
 
 # Name       Name of airport. May or may not contain the City name.
 # City       Main city served by airport. May be spelled differently from Name.
@@ -33,20 +47,16 @@ class AirportNotFoundException(Exception):
 
 
 class Airports(object):
-    with open('transportation/data_generators/airports_list.json') as air_list:
+    with open("transportation/data_generators/airports_list.json") as air_list:
         AIRPORT_LIST = json.load(air_list)
-    with open('transportation/data_generators/other_list.json') as other_list:
+    with open("transportation/data_generators/other_list.json") as other_list:
         OTHER_LIST = json.load(other_list)
 
     def __init__(self):
 
-        self.airports = {
-            _[3].upper(): Airport(*_) for _ in self.AIRPORT_LIST
-        }
+        self.airports = {_[3].upper(): Airport(*_) for _ in self.AIRPORT_LIST}
 
-        self.other = {
-            _[0].upper(): Other(*_) for _ in self.OTHER_LIST
-        }
+        self.other = {_[0].upper(): Other(*_) for _ in self.OTHER_LIST}
 
     @staticmethod
     def _validate(iata):
@@ -71,7 +81,9 @@ class Airports(object):
         iata = self._validate(iata)
 
         if not self.is_valid(iata):
-            raise AirportNotFoundException("iata not found in either airport list: {0}".format(iata))
+            raise AirportNotFoundException(
+                "iata not found in either airport list: {0}".format(iata)
+            )
 
         if table is None:
             # Prefer self.airports over self.other
@@ -85,10 +97,14 @@ class Airports(object):
 def generate_airports():
     airports = Airports()
     for code, info in airports.airports.items():
-        address = Address(country=info.country, city=info.city, lat=float(info.lat), lon=float(info.lon),
-                          timezone=info.tz)
+        address = Address(
+            country=info.country,
+            city=info.city,
+            lat=float(info.lat),
+            lon=float(info.lon),
+            timezone=info.tz,
+        )
         address.save()
         airport = AirportModel(name=info.name, address=address)
         airport.save()
     return airports
-

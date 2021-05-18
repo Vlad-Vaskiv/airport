@@ -1,4 +1,7 @@
+import coreapi
+import coreschema
 from rest_framework import viewsets, status, generics
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -9,6 +12,9 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.db import models
+from rest_framework.schemas import ManualSchema, AutoSchema
+from rest_framework.views import APIView
+from .utils import calculate_total_amount
 
 from .models import *
 from .serializers import *
@@ -56,6 +62,7 @@ class FlightView(viewsets.ModelViewSet):
     filterset_fields = (
         "departure_airport__address__city",
         "arrival_airport__address__city",
+        "status",
     )
 
 
@@ -72,6 +79,41 @@ class TicketView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(passenger=self.request.user.passenger)
+
+
+class PriceView(APIView):
+    schema = AutoSchema(
+        manual_fields=[
+            coreapi.Field(
+                "flight_id",
+                required=True,
+                location="path",
+                schema=coreschema.Integer(
+                    title="Flight ID",
+                    description="Flight ID.",
+                ),
+            ),
+            coreapi.Field(
+                "seat_id",
+                location="query",
+                required=True,
+                schema=coreschema.Integer(
+                    title="Seat ID",
+                    description="Seat ID",
+                ),
+            ),
+        ],
+    )
+
+    def get(self, request, format=None):
+        flight_id = request.query_params.get("flight_id")
+        seat_id = request.query_params.get("seat_id")
+        if flight_id and seat_id:
+            flight = Flight.objects.get(id=flight_id)
+            seat = Seat.objects.get(id=seat_id)
+            total_amount = calculate_total_amount(flight, seat)
+            return Response({"total_amount": total_amount})
+        return Response(status=400)
 
 
 class Signup(generics.CreateAPIView):

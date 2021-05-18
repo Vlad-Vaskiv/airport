@@ -36,6 +36,7 @@ class SeatAdmin(admin.ModelAdmin):
 class TicketAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     pass
