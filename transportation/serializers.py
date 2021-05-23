@@ -34,8 +34,8 @@ class ModelSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class AircraftSerializer(serializers.HyperlinkedModelSerializer):
-    model = ModelSerializer(many=False)
-    seats = serializers.PrimaryKeyRelatedField(queryset=Seat.objects.all())
+    model = ModelSerializer(many=False, read_only=True)
+    # seats = serializers.PrimaryKeyRelatedField(queryset=Seat.objects.all())
 
     class Meta:
         model = Aircraft
@@ -57,9 +57,9 @@ class AirportSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FlightSerializer(serializers.HyperlinkedModelSerializer):
-    departure_airport = AirportSerializer(many=False)
-    arrival_airport = AirportSerializer(many=False)
-    aircraft = AircraftSerializer(many=False)
+    departure_airport = AirportSerializer(many=False, read_only=True)
+    arrival_airport = AirportSerializer(many=False, read_only=True)
+    aircraft = AircraftSerializer(many=False, read_only=True)
 
     class Meta:
         model = Flight

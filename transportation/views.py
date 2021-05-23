@@ -23,7 +23,7 @@ from base.tokens import account_activation_token
 
 
 class AirportView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
 
@@ -37,25 +37,25 @@ class PassengerView(viewsets.ModelViewSet):
 
 
 class ModelView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
 
 
 class AircraftView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Aircraft.objects.all()
     serializer_class = AircraftSerializer
 
 
 class AddressView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
 
 class FlightView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
     filter_backends = (filters.DjangoFilterBackend,)
