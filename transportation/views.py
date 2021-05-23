@@ -58,13 +58,24 @@ class FlightView(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset_fields = (
-        "departure_airport__address__city",
-        "arrival_airport__address__city",
-        "status",
-        'scheduled_departure'
-    )
+    # filter_backends = (filters.DjangoFilterBackend,)
+    # filterset_fields = (
+    #     "departure_airport__address__city",
+    #     "arrival_airport__address__city",
+    #     "status",
+    #     'scheduled_departure'
+    # )
+
+    def get_queryset(self):
+        departure_airport__address__city = self.request.data.get("departure_airport__address__city")
+        arrival_airport__address__city = self.request.data.get('arrival_airport__address__city')
+        queryset = super().get_queryset()
+        if departure_airport__address__city:
+            queryset = queryset.filter(departure_airport__address__city=departure_airport__address__city)
+        if arrival_airport__address__city:
+            queryset = queryset.filter(arrival_airport__address__city=arrival_airport__address__city)
+        return queryset
+
 
 
 class SeatView(viewsets.ModelViewSet):
