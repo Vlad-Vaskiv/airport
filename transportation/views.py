@@ -67,8 +67,8 @@ class FlightView(viewsets.ModelViewSet):
     # )
 
     def get_queryset(self):
-        departure_airport__address__city = self.request.data.get("departure_airport__address__city")
-        arrival_airport__address__city = self.request.data.get('arrival_airport__address__city')
+        departure_airport__address__city = self.request.query_params.get("departure_airport__address__city")
+        arrival_airport__address__city = self.request.query_params.get('arrival_airport__address__city')
         queryset = super().get_queryset()
         if departure_airport__address__city:
             queryset = queryset.filter(departure_airport__address__city=departure_airport__address__city)
