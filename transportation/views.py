@@ -15,7 +15,7 @@ from django.db import models
 from rest_framework.schemas import ManualSchema, AutoSchema
 from rest_framework.views import APIView
 from .utils import calculate_total_amount
-
+import datetime
 from .models import *
 from .serializers import *
 
@@ -69,11 +69,17 @@ class FlightView(viewsets.ModelViewSet):
     def get_queryset(self):
         departure_airport__address__city = self.request.query_params.get("departure_airport__address__city")
         arrival_airport__address__city = self.request.query_params.get('arrival_airport__address__city')
+        scheduled_departure = self.request.query_params.get('scheduled_departure')
         queryset = super().get_queryset()
         if departure_airport__address__city:
             queryset = queryset.filter(departure_airport__address__city=departure_airport__address__city)
         if arrival_airport__address__city:
             queryset = queryset.filter(arrival_airport__address__city=arrival_airport__address__city)
+        if scheduled_departure:
+            queryset = queryset.filter(scheduled_departure__date=datetime.datetime.strptime(scheduled_departure,
+                                                                                            "%d-%m-%Y")
+                                       .date())
+
         return queryset
 
 

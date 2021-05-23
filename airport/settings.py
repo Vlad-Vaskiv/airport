@@ -152,3 +152,5 @@ CELERY_RESULT_BACKEND = "redis://redis:6379"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 CORS_ORIGIN_ALLOW_ALL = DEBUG
+
+X_FRAME_OPTIONS = "*"
