@@ -63,6 +63,7 @@ class FlightView(viewsets.ModelViewSet):
         "departure_airport__address__city",
         "arrival_airport__address__city",
         "status",
+        'scheduled_departure'
     )
 
 
