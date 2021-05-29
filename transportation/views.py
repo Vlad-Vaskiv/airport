@@ -1,5 +1,6 @@
 import coreapi
 import coreschema
+from django.db.models import Prefetch
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -83,11 +84,15 @@ class SeatView(viewsets.ModelViewSet):
     serializer_class = SeatSerializer
 
     def get_queryset(self):
-        aircraft_id = self.request.query_params.get("aircraft_id")
-        if not aircraft_id:
-            raise ValidationError(detail='aircraft_id is required!')
+        flight_id = self.request.query_params.get("flight_id")
+        flight = Flight.objects.filter(id=flight_id).first()
+        if not flight_id or not flight:
+            raise ValidationError(detail='aircraft_id is missed or flight does not exist!')
         queryset = super().get_queryset()
-        return queryset.filter(aircraft_id=aircraft_id)
+        return queryset.filter(aircraft_id=flight.aircraft_id).prefetch_related(
+            Prefetch('ticket_set', queryset=Ticket.objects.filter(flight=flight)
+                     )
+        )
 
 
 class TicketView(viewsets.ModelViewSet):
