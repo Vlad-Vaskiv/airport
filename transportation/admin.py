@@ -40,3 +40,8 @@ class TicketAdmin(admin.ModelAdmin):
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(FareConditionPrice)
+class FareConditionPriceAdmin(admin.ModelAdmin):
+    pass

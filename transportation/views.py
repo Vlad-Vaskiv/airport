@@ -1,6 +1,6 @@
 import coreapi
 import coreschema
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Value, CharField, IntegerField
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -90,9 +90,9 @@ class SeatView(viewsets.ModelViewSet):
             raise ValidationError(detail='aircraft_id is missed or flight does not exist!')
         queryset = super().get_queryset()
         return queryset.filter(aircraft_id=flight.aircraft_id).prefetch_related(
-            Prefetch('ticket_set', queryset=Ticket.objects.filter(flight=flight)
-                     )
-        )
+            Prefetch('ticket_set', queryset=Ticket.objects.filter(flight=flight), to_attr='ticket_obj'
+                     ),
+        ).annotate(flight_id=Value(flight_id, output_field=IntegerField()))
 
 
 class TicketView(viewsets.ModelViewSet):
@@ -165,8 +165,6 @@ class Signup(generics.CreateAPIView):
         Token.objects.create(user=user)
         Passenger.objects.create(user=user, **request.data)
 
-        return Response(status=status.HTTP_201_CREATED)
-
         # ToDo Create email confirmation logic
 
         # current_site = get_current_site(request)
@@ -180,3 +178,11 @@ class Signup(generics.CreateAPIView):
         # user.email_user(subject, message)
         #
         # return Response(data={"message": f"Email confirmation sent to {user.email}"}, status=status.HTTP_201_CREATED)
+
+
+class Logout(APIView):
+
+    def get(self, request, format=None):
+        # simply delete the token to force a login
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)

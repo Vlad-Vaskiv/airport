@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth.models import User
 
+from .utils import calculate_total_amount
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,7 +58,7 @@ class AirportSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class FlightSerializer(serializers.HyperlinkedModelSerializer):
+class FlightSerializer(serializers.ModelSerializer):
     departure_airport = AirportSerializer(many=False, read_only=True)
     arrival_airport = AirportSerializer(many=False, read_only=True)
     aircraft = AircraftSerializer(many=False, read_only=True)
@@ -66,20 +68,27 @@ class FlightSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class TicketSerializer(serializers.HyperlinkedModelSerializer):
+class TicketSerializer(serializers.ModelSerializer):
     total_amount = serializers.DecimalField(
         max_digits=8, decimal_places=2, required=False
     )
+    # passenger = PassengerSerializer(many=False)
 
     class Meta:
         model = Ticket
-        fields = "__all__"
+        # fields = "__all__"
+        fields = ["flight_id", 'seat_id', 'total_amount']
 
 
-class SeatSerializer(serializers.HyperlinkedModelSerializer):
-    aircraft = AircraftSerializer(many=False)
-    ticket = TicketSerializer(source='ticket_set', required=False)
+class SeatSerializer(serializers.ModelSerializer):
+    aircraft = AircraftSerializer(many=False, read_only=True)
+    ticket = TicketSerializer(source='ticket_set', read_only=True)
+    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Seat
         fields = "__all__"
+
+    def get_price(self, seat):
+        flight = Flight.objects.get(id=seat.flight_id)
+        return calculate_total_amount(flight, seat)

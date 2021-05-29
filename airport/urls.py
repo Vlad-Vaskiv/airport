@@ -22,7 +22,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
 
-from transportation.views import Signup
+from transportation.views import Signup, Logout
 
 
 class SchemaGenerator(OpenAPISchemaGenerator):
@@ -54,5 +54,6 @@ urlpatterns = [
     ),
     path("api/", include("transportation.urls")),
     path("signup/", Signup.as_view(), name="sign_up"),
+    path('logout/', Logout.as_view(), name="sign_out"),
     path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
 ]
