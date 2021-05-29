@@ -4,6 +4,7 @@ from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django_filters import rest_framework as filters
@@ -58,13 +59,6 @@ class FlightView(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-    # filter_backends = (filters.DjangoFilterBackend,)
-    # filterset_fields = (
-    #     "departure_airport__address__city",
-    #     "arrival_airport__address__city",
-    #     "status",
-    #     'scheduled_departure'
-    # )
 
     def get_queryset(self):
         departure_airport__address__city = self.request.query_params.get("departure_airport__address__city")
@@ -83,11 +77,17 @@ class FlightView(viewsets.ModelViewSet):
         return queryset
 
 
-
 class SeatView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     queryset = Seat.objects.all()
     serializer_class = SeatSerializer
+
+    def get_queryset(self):
+        aircraft_id = self.request.query_params.get("aircraft_id")
+        if not aircraft_id:
+            raise ValidationError(detail='aircraft_id is required!')
+        queryset = super().get_queryset()
+        return queryset.filter(aircraft_id=aircraft_id)
 
 
 class TicketView(viewsets.ModelViewSet):

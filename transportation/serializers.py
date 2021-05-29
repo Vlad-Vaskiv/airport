@@ -66,14 +66,6 @@ class FlightSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
-class SeatSerializer(serializers.HyperlinkedModelSerializer):
-    aircraft = AircraftSerializer(many=False)
-
-    class Meta:
-        model = Seat
-        fields = "__all__"
-
-
 class TicketSerializer(serializers.HyperlinkedModelSerializer):
     total_amount = serializers.DecimalField(
         max_digits=8, decimal_places=2, required=False
@@ -81,4 +73,13 @@ class TicketSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Ticket
+        fields = "__all__"
+
+
+class SeatSerializer(serializers.HyperlinkedModelSerializer):
+    aircraft = AircraftSerializer(many=False)
+    ticket = TicketSerializer(source='ticket_set', required=False)
+
+    class Meta:
+        model = Seat
         fields = "__all__"
