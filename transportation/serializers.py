@@ -80,9 +80,21 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ["flight_id", 'seat_id', 'total_amount']
 
 
+class CreateTicketSerializer(serializers.ModelSerializer):
+    # total_amount = serializers.DecimalField(
+    #     max_digits=8, decimal_places=2, required=False
+    # )
+    # passenger = PassengerSerializer(many=False)
+
+    class Meta:
+        model = Ticket
+        # fields = "__all__"
+        fields = ["flight", 'seat', 'total_amount']
+
+
 class SeatSerializer(serializers.ModelSerializer):
     aircraft = AircraftSerializer(many=False, read_only=True)
-    ticket = TicketSerializer(source='ticket_set', read_only=True)
+    ticket = serializers.SerializerMethodField(required=False)
     price = serializers.SerializerMethodField()
 
     class Meta:
@@ -92,3 +104,10 @@ class SeatSerializer(serializers.ModelSerializer):
     def get_price(self, seat):
         flight = Flight.objects.get(id=seat.flight_id)
         return calculate_total_amount(flight, seat)
+
+    def get_ticket(self, seat):
+        try:
+            ticket = Ticket.objects.get(flight=Flight.objects.get(id=seat.flight_id), seat=seat)
+            return TicketSerializer(ticket, many=False).data
+        except:
+            return None

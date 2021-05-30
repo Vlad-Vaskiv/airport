@@ -98,10 +98,22 @@ class SeatView(viewsets.ModelViewSet):
 class TicketView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
+    serializer_class = CreateTicketSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            # Account.objects.create_user(**serializer.validated_data)
+            Ticket.objects.create(passenger=Passenger.objects.get(user=request.user), **serializer.validated_data)
+            return Response({'message': 'Ticket created'}, status=status.HTTP_201_CREATED)
+
+        return Response({
+            'status': 'Bad Request',
+            'message': 'Ticket could not be created with received data'
+        }, status=status.HTTP_400_BAD_REQUEST)
 
     def get_queryset(self):
-        return self.queryset.filter(passenger=self.request.user.passenger)
+        return self.queryset.filter(passenger=Passenger.objects.get(self.request.user))
 
 
 class PriceView(APIView):
@@ -148,11 +160,9 @@ class Signup(generics.CreateAPIView):
     serializer_class = SignupSerializer
 
     def post(self, request, *args, **kwargs):
-
         raw_user = request.data.pop("user")
         if User.objects.filter(
             models.Q(email=raw_user.get("email"))
-            | models.Q(username=raw_user.get("username"))
         ).exists():
             return Response(
                 data={
@@ -161,9 +171,16 @@ class Signup(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        user = User.objects.create_user(is_active=False, **raw_user)
+        # user = User.objects.create_user(is_active=False, **raw_user)
+        user = User(
+            email=raw_user['email'],
+            username=raw_user['username']
+        )
+        user.set_password(raw_user['password'])
+        user.save()
         Token.objects.create(user=user)
         Passenger.objects.create(user=user, **request.data)
+        return Response(data={"message": 'passenger created'}, status=status.HTTP_201_CREATED)
 
         # ToDo Create email confirmation logic
 
