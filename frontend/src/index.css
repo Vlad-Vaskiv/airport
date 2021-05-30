@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+.header {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  background: url("https://www.securityroundtable.org/wp-content/uploads/2018/07/AdobeStock_103287945.jpeg");
+}
+
+.header .cities-selector {
+  display: flex;
+}
+
+.flight-configurator {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.flight-configurator .ant-picker {
+  margin-top: 5px;
+}
+
+.flight-configurator .ant-btn {
+  margin-top: 15px;
+}
+
+.flight-configurator img {
+  fill: white;
+  width: 20px;
+  margin: 0 10px;
+  display: flex;
+}
+
+.info-bloc {
+  min-height: 50vh;
+}
+
+.flights {
+  padding: 10px;
+}
+
+.create-seats-modal .seat-content {
+  display: flex;
+  justify-content: center;
+}
