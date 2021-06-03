@@ -21,6 +21,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
+from django.conf import settings
+from django.conf.urls.static import static
 
 from transportation.views import Signup, Logout
 
@@ -57,3 +59,6 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name="sign_out"),
     path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
