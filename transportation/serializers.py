@@ -37,7 +37,6 @@ class ModelSerializer(serializers.HyperlinkedModelSerializer):
 
 class AircraftSerializer(serializers.HyperlinkedModelSerializer):
     model = ModelSerializer(many=False, read_only=True)
-    # seats = serializers.PrimaryKeyRelatedField(queryset=Seat.objects.all())
 
     class Meta:
         model = Aircraft
@@ -72,23 +71,15 @@ class TicketSerializer(serializers.ModelSerializer):
     total_amount = serializers.DecimalField(
         max_digits=8, decimal_places=2, required=False
     )
-    # passenger = PassengerSerializer(many=False)
 
     class Meta:
         model = Ticket
-        # fields = "__all__"
         fields = ["flight_id", 'seat_id', 'total_amount']
 
 
 class CreateTicketSerializer(serializers.ModelSerializer):
-    # total_amount = serializers.DecimalField(
-    #     max_digits=8, decimal_places=2, required=False
-    # )
-    # passenger = PassengerSerializer(many=False)
-
     class Meta:
         model = Ticket
-        # fields = "__all__"
         fields = ["flight", 'seat', 'total_amount']
 
 

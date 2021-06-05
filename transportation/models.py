@@ -19,6 +19,9 @@ class Passenger(models.Model):
     phone = models.CharField(max_length=15)
     email_confirmed = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Model(BaseModel):
     """Class describing Aircraft model"""
