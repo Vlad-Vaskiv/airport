@@ -103,6 +103,9 @@ class Flight(BaseModel):
             ),
         ]
 
+    def __str__(self):
+        return f'{self.flight_no} - {self.departure_airport} - {self.arrival_airport}'
+
 
 class Seat(BaseModel):
     """Seat representation"""

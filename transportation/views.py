@@ -2,23 +2,14 @@ import coreapi
 import coreschema
 from django.db.models import Prefetch, Value, CharField, IntegerField
 from rest_framework import viewsets, status, generics
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django_filters import rest_framework as filters
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.db import models
 from rest_framework.schemas import ManualSchema, AutoSchema
 from rest_framework.views import APIView
-from .utils import calculate_total_amount
 import datetime
-from .models import *
 from .serializers import *
 
 from base.tokens import account_activation_token
@@ -171,7 +162,6 @@ class Signup(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # user = User.objects.create_user(is_active=False, **raw_user)
         user = User(
             email=raw_user['email'],
             username=raw_user['username']
@@ -181,20 +171,6 @@ class Signup(generics.CreateAPIView):
         Token.objects.create(user=user)
         Passenger.objects.create(user=user, **request.data)
         return Response(data={"message": 'passenger created'}, status=status.HTTP_201_CREATED)
-
-        # ToDo Create email confirmation logic
-
-        # current_site = get_current_site(request)
-        # subject = f'Dear {user.first_name}. Activate Your Account'
-        # message = render_to_string('account_activation_email.html', {
-        #     'user': user,
-        #     'domain': current_site.domain,
-        #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        #     'token': account_activation_token.make_token(user),
-        # })
-        # user.email_user(subject, message)
-        #
-        # return Response(data={"message": f"Email confirmation sent to {user.email}"}, status=status.HTTP_201_CREATED)
 
 
 class Logout(APIView):

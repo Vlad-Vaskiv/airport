@@ -4,27 +4,31 @@ from .models import *
 
 @admin.register(Passenger)
 class PassengerAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['username', 'phone', 'passport_number']
 
 
 @admin.register(Model)
 class ModelAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name',]
 
 
 @admin.register(Aircraft)
 class AircraftAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['code', ]
+    # inlines = [ModelInline, ]
 
 
 @admin.register(Airport)
 class AirportAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ['name', ]
+    # inlines = [AddressInline, ]
 
 
 @admin.register(Flight)
 class FlightAdmin(admin.ModelAdmin):
-    pass
+    list_filter = ['status', ]
+    search_fields = ['flight_no', ]
+    date_hierarchy = 'scheduled_departure'
 
 
 @admin.register(Seat)
